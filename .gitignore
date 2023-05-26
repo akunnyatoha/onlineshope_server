@@ -1,0 +1,6 @@
+#Folder
+/config
+/node_modules
+
+#File
+.env
