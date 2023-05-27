@@ -51,6 +51,7 @@ router.get('master-products/destroy/:id', productController.destroy);
 
 // //productComponent router
 router.post('/master-product-components/store', productComponentController.store);
+router.get('/master-product-components', productComponentController.getAllProductComponent);
 router.get('/master-product-components/find/:id', productComponentController.getProductComponentById);
 router.post('/master-product-components/update/:id', productComponentController.update);
 router.get('/master-product-components/destroy/:id', productComponentController.destroy);

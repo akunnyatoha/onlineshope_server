@@ -3,7 +3,7 @@ const {User, Role} = require('../models')
 const index = async (req, res) => {
     const qNew = req.query.new;
     const qRole = req.query.role;
-    // console.log(qNew);
+    
     try {
             let getData;
             let response ;

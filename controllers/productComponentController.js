@@ -1,4 +1,5 @@
-const {ProductComponent} = require('../models');
+const {Product, ProductComponent} = require('../models');
+const productcomponent = require('../models/productcomponent');
 
 const store = async (req, res) => {
     const requestData = {
@@ -8,12 +9,37 @@ const store = async (req, res) => {
         price: req.body.price
     }
 
+    const getProduct = await Product.findOne({where: {id: requestData.id_product}, include:[{model:ProductComponent, as:'productComponent'}]});
+    // const productComponent = getProduct.productComponent;
+
     try {
-        const savedData = ProductComponent.create(requestData);
-        const response = {
-            message: "Data berhasil disimpan.",
-            data: savedData
-        };
+        let response;
+        let savedData;
+        if(getProduct.productComponent.length > 0){
+            const getProductComponent = ProductComponent.findOne({where: {id_product: idProduct, number_size: requestData.number_size}}); 
+            response = data;
+        } else {
+            response = "Kosong"
+        }    
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(error);
+    }
+}
+
+const getAllProductComponent = async(req, res) => {
+    const idProduct = req.query.id_product;
+
+    try {
+        let response;
+        let getData ;
+        if(idProduct != null || idProduct != undefined) {
+            getData = await ProductComponent.findAll({where: {id_product: idProduct}});
+            response = {message: "Oke", data: getData};
+        } else {
+            getData = await ProductComponent.findAll();
+            response = {message: "Oke", data: getData};
+        }
         res.status(200).json(response);
     } catch (error) {
         res.status(500).json(error);
@@ -75,5 +101,6 @@ module.exports = {
     store,
     getProductComponentById,
     update,
-    destroy
+    destroy,
+    getAllProductComponent
 }
