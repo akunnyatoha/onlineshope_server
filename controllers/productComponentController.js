@@ -1,3 +1,4 @@
+const { response } = require('express');
 const {Product, ProductComponent} = require('../models');
 const productcomponent = require('../models/productcomponent');
 
@@ -9,17 +10,38 @@ const store = async (req, res) => {
         price: req.body.price
     }
 
-    const getProduct = await Product.findOne({where: {id: requestData.id_product}, include:[{model:ProductComponent, as:'productComponent'}]});
-    // const productComponent = getProduct.productComponent;
-
     try {
-        let response;
+        const getProduct = await Product.findOne({where: {id: requestData.id_product}, include:[{model:ProductComponent, as:'productComponent'}]});
+        
         let savedData;
+        let response;
         if(getProduct.productComponent.length > 0){
-            const getProductComponent = ProductComponent.findOne({where: {id_product: idProduct, number_size: requestData.number_size}}); 
-            response = data;
+            let getProductComponent = [];
+            for (let i = 0; i < getProduct.productComponent.length; i++) {
+                if(requestData.number_size == getProduct.productComponent[i].number_size && requestData.id_product == getProduct.productComponent[i].id_product) {
+                    getProductComponent = getProduct.productComponent[i];
+                }
+            }
+            if(getProductComponent.length != 0) {
+                const totQty = getProductComponent.quantity + parseInt(requestData.quantity);
+                savedData = ProductComponent.update({quantity: totQty, price: requestData.price},{where: {id_product: requestData.id_product, number_size: requestData.number_size}});
+                response = {
+                    message: "Data berhasil disimpan.",
+                    data: savedData
+                };
+            } else {
+                savedData = ProductComponent.create(requestData);
+                response = {
+                    message: "Data berhasil disimpan.",
+                    data: savedData
+                };
+            }
         } else {
-            response = "Kosong"
+            savedData = ProductComponent.create(requestData);
+            response = {
+                message: "Data berhasil disimpan.",
+                data: savedData
+            };
         }    
         res.status(200).json(response);
     } catch (error) {
